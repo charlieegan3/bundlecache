@@ -2,10 +2,11 @@
 
 Features:
 
-* no extra service
-* simple Dockerfile
-* manual caching command
-* easy to understand
+* No extra compose service
+* Simple Dockerfile change
+* Manual caching command
+* Easy to clear cache
+* Generally easy to understand
 
 ```
 # build the image, and do the first slow bundle install 
