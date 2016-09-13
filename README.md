@@ -12,7 +12,7 @@ Features:
 docker build . -t my_app
 
 # bundle good? cache it with
-docker run -it -v "$(pwd):/app" my_app ./save_bundle.sh
+docker run -it -v "$(pwd):/app" my_app ./cache_bundle.sh
 
 # edit the Gemfile
 # vi Gemfile
