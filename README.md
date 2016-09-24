@@ -13,18 +13,23 @@ Features:
 
 This repo implements an example 'app' using bundlecache. The workflow is outlined below.
 
-1. Build the image, and do the first slow bundle install:
+1. Create an empty bundle archive to use in the first build:
+
+  ```bash
+  touch bundle.tar.gz
+  ```
+2. Build the image, and do the first slow bundle install:
 
   ```bash
   docker build . -t bundlecache_example
   ```
-2. Make some edits to the Gemfile (new gems, change versions etc.)
-3. Bundle install:
+3. (Optional) Make some edits to the Gemfile (new gems, change versions etc.)
+3. Bundle install to get the Gemfile.lock out:
 
   ```bash
   docker run -it -v "$(pwd):/app" bundlecache_example bundle install
   ```
-4. Cache the bundle's current state:
+4. Cache the bundle's current state (can take upto 30 seconds for larger bundles):
 
   ```bash
   docker run -it -v "$(pwd):/app" bundlecache_example bundlecache
@@ -43,17 +48,12 @@ Note how this time during `bundle install` that gems in the existing bundle are 
   ```bash
   touch bundle.tar.gz
   ```
-2. Commit the empty archive to version control:
+2. Ignore the bundle cache archive:
 
   ```bash
-  git add bundle.tar.gz && git commit -m "Add empty bundle archive"
+  echo "bundle.tar.gz" >> .gitignore
   ```
-3. Ignore further changes to the archive:
-
-  ```bash
-  echo -e "bundle.tar.gz\n" >> .gitignore
-  ```
-4. Add the following to your Dockerfile:
+3. Add the following to your Dockerfile:
 
   ```Dockerfile
   # include alongside adding Gemfile (requires use of ADD for unarchiving)
