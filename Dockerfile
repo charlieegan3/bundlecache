@@ -2,12 +2,12 @@ FROM ruby
 
 WORKDIR /app
 
-COPY ./bundle /usr/local/bundle/
+ADD ./bundle.tar.gz /
 COPY ./Gemfile /app
 COPY ./Gemfile.lock /app
 
 RUN bundle install && bundle clean
-RUN printf '#!/bin/sh\ncp -r /usr/local/bundle /app\n' > /usr/local/bin/cache-bundle
+RUN printf '#!/bin/sh\ntar -zcf /app/bundle.tar.gz /usr/local/bundle\n' > /usr/local/bin/cache-bundle
 RUN chmod +x /usr/local/bin/cache-bundle
 
 COPY ./ /app
