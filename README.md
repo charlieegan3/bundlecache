@@ -1,27 +1,67 @@
-# Docker Bundle Cache
+# bundlecache
+
+Reduce re-bundling time in docker builds using a cached bundle.
 
 Features:
 
-* No extra compose service
 * Simple Dockerfile change
 * Manual caching command
-* Easy to clear cache
-* Generally easy to understand
+* No extra compose service
+* Easy to clear cache (checkout bundle archive)
 
-```
-# build the image, and do the first slow bundle install 
-docker build . -t my_app
+## Using this repo
 
-# bundle good? cache it with
-docker run -it -v "$(pwd):/app" my_app cache-bundle
+This repo implements an example 'app' using bundlecache. The workflow is outlined below.
 
-# edit the Gemfile
-# vi Gemfile
+1. Build the image, and do the first slow bundle install:
 
-# build the image again
-docker build . -t my_app
+  ```bash
+  docker build . -t bundlecache_example
+  ```
+2. Make some edits to the Gemfile (new gems, change versions etc.)
+3. Bundle install:
 
-# note "Using..."
+  ```bash
+  docker run -it -v "$(pwd):/app" bundlecache_example bundle install
+  ```
+4. Cache the bundle's current state:
 
-# profit? 💰 
-```
+  ```bash
+  docker run -it -v "$(pwd):/app" bundlecache_example bundlecache
+  ```
+5. Build the image a second time:
+
+  ```bash
+  docker build . -t bundlecache_example
+  ```
+Note how this time during `bundle install` that gems in the existing bundle are used, rather than installing from scratch.
+
+## Using bundlecache in an existing image
+
+1. Create an empty bundle archive:
+
+  ```bash
+  touch bundle.tar.gz
+  ```
+2. Commit the empty archive to version control:
+
+  ```bash
+  git add bundle.tar.gz && git commit -m "Add empty bundle archive"
+  ```
+3. Ignore further changes to the archive:
+
+  ```bash
+  echo -e "bundle.tar.gz\n" >> .gitignore
+  ```
+4. Add the following to your Dockerfile:
+
+  ```Dockerfile
+  # include alongside adding Gemfile (requires use of ADD for unarchiving)
+  ADD ./bundle.tar.gz /
+
+  # include anywhere, this enables the `bundecache` command
+  RUN printf '#!/bin/sh\ntar -zcf /app/bundle.tar.gz /usr/local/bundle\n' > /usr/local/bin/bundlecache
+  RUN chmod +x /usr/local/bin/bundlecache
+  ```
+
+Then follow the workflow outlined above, making adjustments to the application name and WORKDIR where required.

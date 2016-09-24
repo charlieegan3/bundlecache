@@ -7,8 +7,8 @@ COPY ./Gemfile /app
 COPY ./Gemfile.lock /app
 
 RUN bundle install && bundle clean
-RUN printf '#!/bin/sh\ntar -zcf /app/bundle.tar.gz /usr/local/bundle\n' > /usr/local/bin/cache-bundle
-RUN chmod +x /usr/local/bin/cache-bundle
+RUN printf '#!/bin/sh\ntar -zcf /app/bundle.tar.gz /usr/local/bundle\n' > /usr/local/bin/bundlecache
+RUN chmod +x /usr/local/bin/bundlecache
 
 COPY ./ /app
 
